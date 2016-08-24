@@ -1,4 +1,37 @@
-env = Environment()
+env = Environment(
+    CPPFLAGS = ['-Wall', '-Werror'],
+)
 env.Tool('variantgen', toolpath = ['../../scons_tools'])
-
 cg = env.VariantGen()
+
+# Mode
+vs_mode = cg.AddVariantSet('mode')
+
+v_release = vs_mode.AddVariant('release')
+v_release.Append(
+    CPPDEFINES = ['NDEBUG'],
+    CPPFLAGS = ['-O3'],
+)
+
+v_debug = vs_mode.AddVariant('debug')
+v_debug.Append(
+    CPPDEFINES = ['DEBUG'],
+)
+
+
+# Architecture
+vs_arch = cg.AddVariantSet('arch')
+
+v_x86 = vs_arch.AddVariant('x86')
+v_x86.Append(
+    ARCH = 'x86',
+)
+
+v_arm = vs_arch.AddVariant('arm')
+v_arm.Append(
+    ARCH = 'arm',
+)
+
+
+
+cg.Dump()

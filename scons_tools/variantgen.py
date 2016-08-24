@@ -15,19 +15,22 @@ class AppendVariantAction(VariantActionBase):
 
 
 class Variant(object):
-    def __init__(self, name=None):
-        self.name = name
+    def __init__(self, **kw):
+        self.kw = kw
         self.actions = []
 
     def Append(self, **kw):
         self.actions.append(AppendVariantAction(**kw))
 
     def Apply(self, env):
+        for k,v in self.kw.items():
+            env[k] = v
         for act in self.actions:
             act.Apply(env)
 
     def Dump(self, indent=0):
-        print ' '*indent + '"{0}"'.format(self.name)
+        for k,v in self.kw.items():
+            print ' '*indent + '{0}: {1}'.format(k, v)
         for act in self.actions:
             act.Dump(indent=indent+4)
 
@@ -40,8 +43,8 @@ class VariantSet(object):
         self.name = name
         self.variants = []
 
-    def AddVariant(self, name=None):
-        v = Variant(name)
+    def AddVariant(self, **kw):
+        v = Variant(**kw)
         self.variants.append(v)
         return v
 

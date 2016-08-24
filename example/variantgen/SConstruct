@@ -2,7 +2,10 @@ from pprint import pprint
 
 env = Environment(
     CPPFLAGS = ['-Wall', '-Werror'],
-    NAME = '$ARCH-$OS-$MODE',
+    NAME = '$ARCHNAME-$OS-$MODE',
+    
+    BUILD_ROOT = '#build',
+    BUILD_DIR = '$BUILD_ROOT/$ARCH/$SUBARCH/$OS/$MODE',
 )
 env.Tool('variantgen', toolpath = ['../../scons_tools'])
 cg = env.VariantGen()
@@ -25,8 +28,9 @@ v_debug.Append(
 # Architecture
 vs_arch = cg.AddVariantSet('arch')
 
-vs_arch.AddVariant(ARCH='x86')
-vs_arch.AddVariant(ARCH='arm')
+vs_arch.AddVariant(ARCHNAME='x86_32', ARCH='x86', SUBARCH='32').Append(CCFLAGS=['-m32'], LINKFLAGS=['-m32'])
+vs_arch.AddVariant(ARCHNAME='x86_64', ARCH='x86', SUBARCH='64').Append(CCFLAGS=['-m64'], LINKFLAGS=['-m64'])
+vs_arch.AddVariant(ARCHNAME='arm', ARCH='arm')
 
 
 # OS
@@ -44,3 +48,10 @@ cg.Dump()
 
 for env in cg.GenerateEnvironments():
     print 'Environment:', env.subst('$NAME')
+
+    env.SConscript(
+        dirs = '.',
+        variant_dir = '$BUILD_DIR',
+        duplicate = False,
+        exports = dict(env=env.Clone()),
+    )

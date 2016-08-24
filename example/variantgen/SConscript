@@ -1,0 +1,2 @@
+Import('env')
+env.Program('hello', ['src/hello.c'])

@@ -6,17 +6,12 @@ class VariantActionBase(object):
 
     def Dump(self, indent=0):
         for k,v in self.kw.items():
-            print ' '*indent + '{0}: {1}'.format(k, v)
+            print ' '*indent + '{0} += {1}'.format(k, v)
 
 
 class AppendVariantAction(VariantActionBase):
     def Apply(self, env):
         env.Append(**self.kw)
-
-class ReplaceVariantAction(VariantActionBase):
-    def Apply(self, env):
-        env.Replace(**self.kw)
-
 
 class Variant(object):
     def __init__(self, **kw):
@@ -27,7 +22,7 @@ class Variant(object):
         self.actions.append(AppendVariantAction(**kw))
 
     def Replace(self, **kw):
-        self.actions.append(AppendVariantAction(**kw))
+        self.kw.update(kw)
 
     def Apply(self, env):
         for k,v in self.kw.items():
@@ -39,7 +34,7 @@ class Variant(object):
         for k,v in self.kw.items():
             print ' '*indent + '{0}: {1}'.format(k, v)
         for act in self.actions:
-            act.Dump(indent=indent+4)
+            act.Dump(indent=indent)
 
     def __repr__(self):
         return 'Variant("{0}")'.format(self.name)
@@ -57,7 +52,8 @@ class VariantSet(object):
 
     def Dump(self, indent=0):
         print ' '*indent + '"{0}" :: Variants:'.format(self.name)
-        for v in self.variants:
+        for n,v in enumerate(self.variants):
+            print ' '*indent + '[{0}]'.format(n)
             v.Dump(indent=indent+4)
 
     def __repr__(self):

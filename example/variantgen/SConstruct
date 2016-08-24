@@ -1,0 +1,4 @@
+env = Environment()
+env.Tool('variantgen', toolpath = ['../../scons_tools'])
+
+cg = env.VariantGen()

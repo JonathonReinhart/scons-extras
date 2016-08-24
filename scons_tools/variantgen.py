@@ -1,17 +1,21 @@
 import itertools
 
 class VariantActionBase(object):
+    def __init__(self, **kw):
+        self.kw = kw
+
     def Dump(self, indent=0):
         for k,v in self.kw.items():
             print ' '*indent + '{0}: {1}'.format(k, v)
 
 
 class AppendVariantAction(VariantActionBase):
-    def __init__(self, **kw):
-        self.kw = kw
-
     def Apply(self, env):
         env.Append(**self.kw)
+
+class ReplaceVariantAction(VariantActionBase):
+    def Apply(self, env):
+        env.Replace(**self.kw)
 
 
 class Variant(object):
@@ -20,6 +24,9 @@ class Variant(object):
         self.actions = []
 
     def Append(self, **kw):
+        self.actions.append(AppendVariantAction(**kw))
+
+    def Replace(self, **kw):
         self.actions.append(AppendVariantAction(**kw))
 
     def Apply(self, env):

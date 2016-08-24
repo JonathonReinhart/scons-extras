@@ -1,5 +1,8 @@
+from pprint import pprint
+
 env = Environment(
     CPPFLAGS = ['-Wall', '-Werror'],
+    NAME = '$ARCH-$MODE',
 )
 env.Tool('variantgen', toolpath = ['../../scons_tools'])
 cg = env.VariantGen()
@@ -9,12 +12,14 @@ vs_mode = cg.AddVariantSet('mode')
 
 v_release = vs_mode.AddVariant('release')
 v_release.Append(
+    MODE = 'release',
     CPPDEFINES = ['NDEBUG'],
     CPPFLAGS = ['-O3'],
 )
 
 v_debug = vs_mode.AddVariant('debug')
 v_debug.Append(
+    MODE = 'debug',
     CPPDEFINES = ['DEBUG'],
 )
 
@@ -35,3 +40,6 @@ v_arm.Append(
 
 
 cg.Dump()
+
+for env in cg.GenerateEnvironments():
+    print 'Environment:', env.subst('$NAME')

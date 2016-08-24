@@ -1,3 +1,5 @@
+import itertools
+
 class VariantActionBase(object):
     def Dump(self, indent=0):
         for k,v in self.kw.items():
@@ -8,6 +10,9 @@ class AppendVariantAction(VariantActionBase):
     def __init__(self, **kw):
         self.kw = kw
 
+    def Apply(self, env):
+        env.Append(**self.kw)
+
 
 class Variant(object):
     def __init__(self, name=None):
@@ -17,12 +22,17 @@ class Variant(object):
     def Append(self, **kw):
         self.actions.append(AppendVariantAction(**kw))
 
+    def Apply(self, env):
+        for act in self.actions:
+            act.Apply(env)
 
     def Dump(self, indent=0):
         print ' '*indent + '"{0}"'.format(self.name)
         for act in self.actions:
             act.Dump(indent=indent+4)
 
+    def __repr__(self):
+        return 'Variant("{0}")'.format(self.name)
 
 
 class VariantSet(object):
@@ -40,6 +50,9 @@ class VariantSet(object):
         for v in self.variants:
             v.Dump(indent=indent+4)
 
+    def __repr__(self):
+        return 'VariantSet("{0}")'.format(self.name)
+
 
 class VariantGen(object):
     def __init__(self, base_env):
@@ -55,6 +68,20 @@ class VariantGen(object):
         print 'Variant Sets:'
         for vs in self.variant_sets:
             vs.Dump(indent=indent+4)    
+
+
+    def GenerateEnvironments(self):
+        def gen():
+            # Generate the Cartesian product of all variants in each variant set
+            for variants in itertools.product(*[vs.variants for vs in self.variant_sets]):
+                env = self.base_env.Clone()
+                for v in variants:
+                    v.Apply(env)
+                yield env
+
+        return list(gen())
+
+
 
 
 def generate(env):

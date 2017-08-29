@@ -6,12 +6,30 @@ class VariantActionBase(object):
 
     def Dump(self, indent=0):
         for k,v in self.kw.items():
+            # TODO: This is bogus; it only applies to Append()
             print ' '*indent + '{0} += {1}'.format(k, v)
 
 
 class AppendVariantAction(VariantActionBase):
     def Apply(self, env):
         env.Append(**self.kw)
+
+class AppendUniqueVariantAction(VariantActionBase):
+    def Apply(self, env):
+        env.AppendUnique(**self.kw)
+
+class SetDefaultVariantAction(VariantActionBase):
+    def Apply(self, env):
+        env.SetDefault(**self.kw)
+
+class ToolVariantAction(VariantActionBase):
+    def __init__(self, tool, toolpath=None, **kw):
+        self.tool = tool
+        self.toolpath = toolpath
+        self.kw = kw
+
+    def Apply(self, env):
+        env.Tool(self.tool, toolpath=self.toolpath, **self.kw)
 
 class Variant(object):
     def __init__(self, **kw):
@@ -21,8 +39,17 @@ class Variant(object):
     def Append(self, **kw):
         self.actions.append(AppendVariantAction(**kw))
 
+    def AppendUnique(self, **kw):
+        self.actions.append(AppendUniqueVariantAction(**kw))
+
     def Replace(self, **kw):
         self.kw.update(kw)
+
+    def SetDefault(self, **kw):
+        self.actions.append(SetDefaultVariantAction(**kw))
+
+    def Tool(self, tool, toolpath=None, **kw):
+        self.actions.append(ToolVariantAction(tool, toolpath=toolpath, **kw))
 
     def Apply(self, env):
         for k,v in self.kw.items():

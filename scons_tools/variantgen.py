@@ -1,3 +1,4 @@
+from __future__ import print_function
 import itertools
 
 def pystr(s):
@@ -20,7 +21,8 @@ class VariantAction(object):
         getattr(env, self.method)(*self.args, **self.kwargs)
 
     def Dump(self, indent=0):
-        print ' '*indent + '.{}({})'.format(self.method, func_call_syntax(self.args, self.kwargs))
+        print(' '*indent + '.{}({})'.format(self.method,
+            func_call_syntax(self.args, self.kwargs)))
 
 class Variant(object):
     def __init__(self, **kw):
@@ -50,7 +52,7 @@ class Variant(object):
 
     def Dump(self, indent=0):
         for k,v in self.kw.items():
-            print ' '*indent + '{0}: {1}'.format(k, v)
+            print(' '*indent + '{0}: {1}'.format(k, v))
         for act in self.actions:
             act.Dump(indent=indent)
 
@@ -69,9 +71,9 @@ class VariantSet(object):
         return v
 
     def Dump(self, indent=0):
-        print ' '*indent + '"{0}" :: Variants:'.format(self.name)
+        print(' '*indent + '"{0}" :: Variants:'.format(self.name))
         for n,v in enumerate(self.variants):
-            print ' '*indent + '[{0}]'.format(n)
+            print(' '*indent + '[{0}]'.format(n))
             v.Dump(indent=indent+4)
 
     def __repr__(self):
@@ -89,10 +91,10 @@ class VariantGen(object):
         return vs
 
     def Dump(self, indent=0):
-        print 'Variant Sets:'
+        print('Variant Sets:')
         for vs in self.variant_sets:
             vs.Dump(indent=indent+4)    
-            print ''
+            print('')
 
 
     def GenerateEnvironments(self):

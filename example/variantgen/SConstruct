@@ -38,7 +38,7 @@ vs_os = cg.AddVariantSet('os')
 
 v_win = vs_os.AddVariant()
 v_win.Replace(OS='windows')
-v_win.Tool('null', toolpath=['scons_tools'])
+v_win.Tool('null', toolpath=['scons_tools'], extra1='one', extra2='two')
 
 v_lin = vs_os.AddVariant()
 v_lin.Replace(OS='linux')
